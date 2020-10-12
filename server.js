@@ -2,12 +2,14 @@ import debug from 'debug'
 import morgan from 'morgan'
 import express from 'express'
 import { json, urlencoded } from 'body-parser'
-import { NOT_FOUND } from 'http-status'
+import { NOT_FOUND, OK } from 'http-status'
 import _config from './config/index.js'
 const { dbconn } = _config
 import router from './routes/index.js'
 import _default from './helpers/index.js'
 const { apiResp } = _default
+import { genToken } from './services/crypto'
+
 const info = debug('info')
 
 require('dotenv').config()

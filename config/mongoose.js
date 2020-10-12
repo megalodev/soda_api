@@ -1,4 +1,4 @@
-const mongoose = require('mongoose')
+import mongoose from 'mongoose'
 require('dotenv').config()
 
 const { ENV, DB_URL, DB_URL_TEST } = process.env

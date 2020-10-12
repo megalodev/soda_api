@@ -8,8 +8,8 @@
   "license": "BSD-3-Clause",
   "scripts": {
     "build": "rimraf dist/ && babel ./ --out-dir dist/ --ignore ./node_modules",
-    "start": "npm run build && babel-node --presets es2015 server",
-    "dev": "npm run build && nodemon --exec babel-node --presets es2015 server"
+    "start": "yarn build && babel-node --presets es2015 server",
+    "dev": "yarn build && nodemon --exec babel-node --presets es2015 server"
   },
   "dependencies": {
     "bcrypt": "^5.0.0",
@@ -17,10 +17,10 @@
     "debug": "^4.2.0",
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
-    "external-ip": "^2.3.1",
     "http-status": "^1.4.2",
     "mongoose": "^5.10.9",
-    "morgan": "^1.10.0"
+    "morgan": "^1.10.0",
+    "random-binary": "^1.0.3"
   },
   "devDependencies": {
     "babel": "^6.23.0",
