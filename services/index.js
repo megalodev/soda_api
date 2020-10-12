@@ -1,3 +1,3 @@
-import { passHash, passVerify, genToken } from './crypto'
+import { passHash, passVerify, genToken, expireDate } from './crypto'
 
-export default { passHash, passVerify, genToken }
+export default { passHash, passVerify, genToken, expireDate }

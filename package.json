@@ -19,8 +19,7 @@
     "express": "^4.17.1",
     "http-status": "^1.4.2",
     "mongoose": "^5.10.9",
-    "morgan": "^1.10.0",
-    "random-binary": "^1.0.3"
+    "morgan": "^1.10.0"
   },
   "devDependencies": {
     "babel": "^6.23.0",
