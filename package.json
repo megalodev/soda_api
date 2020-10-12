@@ -8,8 +8,8 @@
   "license": "BSD-3-Clause License",
   "scripts": {
     "build": "rimraf dist/ && babel ./ --out-dir dist/ --ignore ./node_modules",
-    "start": "yarn build && babel-node --presets es2015 server",
-    "dev": "yarn build && nodemon --exec babel-node --presets es2015 server"
+    "start": "npm run build && babel-node --presets es2015 server",
+    "dev": "npm run build && nodemon --exec babel-node --presets es2015 server"
   },
   "dependencies": {
     "bcrypt": "^5.0.0",

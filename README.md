@@ -4,7 +4,7 @@ Smart Contract Mudhorobah API
 
 ## Tools
 
-1. [Nodejs] >= v10.21.0
+1. [Nodejs] >= v12.14.1
 2. [Yarn] 
 3. [MongoDB]
 
