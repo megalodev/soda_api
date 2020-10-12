@@ -1,10 +1,10 @@
 import bcrypt from 'bcrypt'
 import crypto from 'crypto'
-import randomBinary from 'random-binary'
 
 const salt = bcrypt.genSaltSync(15)
-const secret = crypto.randomBytes(32)
-const bins = randomBinary(32)
+const secret = crypto.randomBytes(64)
+const bins = crypto.randomBytes(64)
+const date = new Date()
 
 /**
  * Digunakan untuk hash password
@@ -30,10 +30,17 @@ export function passVerify(password, hash) {
 }
 
 /**
- * Digunakan untuk men-generasi token dengan menggunakan algoritma SHA256
+ * Digunakan untuk men-generasi token dengan menggunakan algoritma SHA-512
  */
 export function genToken() {
-    const hash = crypto.createHmac('sha256', secret).update(bins).digest('hex')
+    const hash = crypto.createHmac('sha512', secret).update(bins).digest('hex')
 
     return hash
+}
+
+/**
+ * Method untuk keperluan kadaluarsa token (7 hari)
+ */
+export function expireDate() {
+    date.setDate(date.getDate() + 7)
 }
