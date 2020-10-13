@@ -3,15 +3,12 @@ import morgan from 'morgan'
 import express from 'express'
 import { json, urlencoded } from 'body-parser'
 import { NOT_FOUND } from 'http-status'
-import _config from './config/index.js'
-const { dbconn } = _config
-import router from './routes/index.js'
-import _default from './helpers/index.js'
-const { apiResp } = _default
-
-const info = debug('info')
+const { dbconn } = require('./config/mongoose')
+import router from './routes/index'
+const { apiResp } = require('./helpers/api_response')
 
 require('dotenv').config()
+const info = debug('info')
 const app = express()
 const { PORT } = process.env
 
