@@ -5,7 +5,7 @@ import { json, urlencoded } from 'body-parser'
 import { NOT_FOUND } from 'http-status'
 const { dbconn } = require('./config/mongoose')
 import router from './routes/index'
-const { apiResp } = require('./helpers/api_response')
+import ApiResponse from './helpers/api_response'
 
 require('dotenv').config()
 const info = debug('info')
@@ -21,7 +21,7 @@ app.use(urlencoded({ extended: false }))
 app.use('/api', router)
 
 app.all('*', function (req, res) {
-    return apiResp(res, 'failed', 'Not found', null, NOT_FOUND)
+    ApiResponse.result(res, 'Failed', 'Not found', null, NOT_FOUND)
 })
 
 app.listen(PORT, function () {

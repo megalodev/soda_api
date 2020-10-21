@@ -1,11 +1,10 @@
 import { OK } from 'http-status'
-
-const { apiResp } = require('../helpers/api_response')
+import ApiResponse from '../helpers/api_response'
 const { gitCommitHash } = require('../helpers/git_rev')
-const pkgJson = require('../package.json')
+const pkg = require('../package.json')
 
 export async function gitInfo(req, res) {
-    const info = { app: pkgJson.name, version: pkgJson.version, git: gitCommitHash() }
+    const info = { app: pkg.name, version: pkg.version, git: gitCommitHash() }
 
-    return apiResp(res, 'success', '', info, OK)
+    return ApiResponse.result(res, 'Success', '', info, OK)
 }
