@@ -1,10 +1,12 @@
 import bcrypt from 'bcrypt'
 import crypto from 'crypto'
+import ms from 'ms'
+import { v4 as uuidv4 } from 'uuid'
 
 const salt = bcrypt.genSaltSync(15)
-const secret = crypto.randomBytes(64)
-const bins = crypto.randomBytes(64)
-const date = new Date()
+const key = crypto.randomBytes(256 / 8).toString('hex')
+const text = uuidv4()
+const bytes = crypto.randomBytes(16)
 
 class Crypto {
 
@@ -25,26 +27,28 @@ class Crypto {
      * @param {string} password 
      * @param {string} hash 
      */
-    static passVerify(password, hash) {
+    static passMatch(password, hash) {
         const verify = bcrypt.compareSync(password, hash)
 
         return verify
     }
 
     /**
-     * Digunakan untuk men-generasi token dengan menggunakan algoritma SHA-512
+     * Digunakan untuk men-generasi token dengan menggunakan algoritma AES-256-CBC
      */
-    static genToken() {
-        const hash = crypto.createHmac('sha512', secret).update(bins).digest('hex')
+    static token() {
+        const chiper = crypto.createCipheriv('aes-256-cbc', Buffer.from(key, 'hex'), bytes)
+        let encrypted = chiper.update(text)
+        encrypted = Buffer.concat([encrypted, chiper.final()])
 
-        return hash
+        return encrypted.toString('hex')
     }
 
     /**
-     * Method untuk keperluan kadaluarsa token (7 hari)
+     * Expired time
      */
-    static expireDate() {
-        date.setDate(date.getDate() + 7)
+    static expires() {
+        return Math.floor(Date.now() + ms('1h'))
     }
 }
 

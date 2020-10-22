@@ -18,6 +18,7 @@ export function dbconn() {
         useUnifiedTopology: true,
         useCreateIndex: true,
         keepAlive: 1,
+        useFindAndModify: false
     }).then(function () { console.log(`Database connected`) })
 
     return mongoose.connection
