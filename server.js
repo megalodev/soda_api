@@ -10,7 +10,7 @@ import ApiResponse from './helpers/api_response'
 require('dotenv').config()
 const info = debug('info')
 const app = express()
-const { PORT } = process.env
+const { BASE_URL, PORT } = process.env
 
 // Database connection
 dbconn()
@@ -20,12 +20,13 @@ app.use(json())
 app.use(urlencoded({ extended: false }))
 app.use('/api', router)
 
+// Jika endpoint salah akan mengarahkan ke ApiResponse NOT_FOUND
 app.all('*', function (req, res) {
     ApiResponse.result(res, 'Failed', 'Not found', null, NOT_FOUND)
 })
 
 app.listen(PORT, function () {
-    console.log(`Server started on http://localhost:${PORT}`);
+    console.log(`Server started on ${BASE_URL}:${PORT}`);
 })
 
 export default app;
