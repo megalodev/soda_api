@@ -1,4 +1,4 @@
-import { BAD_REQUEST, CREATED, INTERNAL_SERVER_ERROR, OK } from 'http-status'
+import { BAD_REQUEST, CREATED, INTERNAL_SERVER_ERROR, OK, UNAUTHORIZED } from 'http-status'
 import jwt from 'jsonwebtoken'
 import ApiResponse from '../helpers/api_response'
 import Crypto from '../services/crypto'
@@ -55,7 +55,7 @@ export async function authorize(req, res) {
 
         // Cek apakah email ada di collection
         const { email, password } = req.body
-        Account.findOne({ email: email }).exec(function (err, account) {
+        Account.findOne({ email: email }, function (err, account) {
             if (err) {
                 console.error(err);
             }
@@ -127,13 +127,15 @@ export async function me(req, res) {
     })
 }
 
-// Belum bisa digunakan
-// export async function unauthorize(req, res) {
-//     AccessToken.deleteOne({ id: req.token_id }, function (err) {
-//         if (err) {
-//             return ApiResponse.result(res, 'Failed', 'Internal server error', null, INTERNAL_SERVER_ERROR)
-//         }
+export async function unauthorize(req, res) {
+    // Menghapus token dari collection. Mungkin token sebelumnya yang sudah dihapus
+    // akan tetap valid, itu dikarenakan jwt menganggap token tersebut masih belum
+    // expired atau kadaluarsa. Waktu expired 1 jam.
+    await AccessToken.findOneAndDelete({ account_id: req.token_id }, function (err) {
+        if (err) {
+            console.error(err);
+        }
 
-//         return ApiResponse.result(res, 'Success', 'Unauthorized', null, UNAUTHORIZED)
-//     })
-// }
+        return ApiResponse.result(res, 'Success', 'Unauthorized', null, UNAUTHORIZED)
+    })
+}
