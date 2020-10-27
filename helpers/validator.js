@@ -18,13 +18,26 @@ class Validator {
     }
 
     /**
-     * 
+     * Authorize validation
      * @param {*} data 
      */
     static authorize(data) {
         const schema = Joi.object().keys({
             email: Joi.string().lowercase().required().email({ minDomainSegments: 2, tlds: { allow: true } }).trim(),
             password: Joi.string().min(8).max(50).required()
+        })
+
+        return schema.validate(data)
+    }
+
+    /**
+     * Activate validation
+     * @param {*} data 
+     */
+    static activate(data) {
+        const schema = Joi.object().keys({
+            token: Joi.string().required().trim(),
+            code: Joi.number().required()
         })
 
         return schema.validate(data)

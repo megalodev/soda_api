@@ -1,17 +1,18 @@
 import mongoose from 'mongoose'
 
-const Account = mongoose.Schema({
+const AccountRegister = mongoose.Schema({
     full_name: { type: String, required: true },
     email: { type: String, required: true, lowercase: true, unique: true },
     phone_num: { type: String, required: true, unique: true },
     password: { type: String, required: true },
-    active: { type: Boolean, required: true, default: false },
+    token: { type: String, required: true },
+    code: { type: Number, required: true },
     register_time: { type: Date, default: Date.now }
 })
 
-Account.index({ email: 1, phone_num: 1 })
+AccountRegister.index({ email: 1, phone_num: 1 })
 
-Account.options.toJSON = {
+AccountRegister.options.toJSON = {
     transform: function (_doc, ret) {
         ret.id = ret._id;
         delete ret._id;
@@ -19,4 +20,4 @@ Account.options.toJSON = {
     }
 }
 
-module.exports = mongoose.model('Account', Account)
+module.exports = mongoose.model('AccountRegister', AccountRegister)

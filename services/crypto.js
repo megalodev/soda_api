@@ -1,7 +1,7 @@
 import bcrypt from 'bcrypt'
 import crypto from 'crypto'
 import ms from 'ms'
-import { v4 as uuidv4 } from 'uuid'
+// import { v4 as uuidv4 } from 'uuid'
 
 const salt = bcrypt.genSaltSync(15)
 const key = crypto.randomBytes(32)
