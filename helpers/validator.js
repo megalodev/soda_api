@@ -42,6 +42,20 @@ class Validator {
 
         return schema.validate(data)
     }
+
+    /**
+     * Update account
+     * @param {*} data 
+     */
+    static update(data) {
+        const schema = Joi.object().keys({
+            full_name: Joi.string().min(3).max(50).trim(),
+            email: Joi.string().lowercase().email({ minDomainSegments: 2, tlds: { allow: true } }).trim(),
+            phone_num: Joi.string().lowercase().min(11).max(13).pattern(/^[0-9]+$/).message('phone_num must be a number').trim(),
+        })
+
+        return schema.validate(data)
+    }
 }
 
 export default Validator;
