@@ -17,5 +17,6 @@ jspm_packages/
 .env
 .env.test
 
-# dist directory
+# Other
 dist/
+docs/
