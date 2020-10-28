@@ -19,6 +19,7 @@ app.use(morgan('combined', { stream: { write: msg => info(msg) } }))
 app.use(json())
 app.use(urlencoded({ extended: false }))
 app.use('/api', router)
+app.use('/api-docs', express.static('./docs'))
 
 // Jika endpoint salah akan mengarahkan ke ApiResponse NOT_FOUND
 app.all('*', function (req, res) {

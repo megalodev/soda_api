@@ -1,15 +1,22 @@
 {
-  "name": "soda_api",
+  "name": "smarak_api",
   "version": "0.1.0",
-  "description": "Smart Contract Mudhorobah API",
+  "description": "Smart Contract Musyarakah API",
   "main": "index.js",
   "repository": "https://github.com/megalodev/soda_api",
   "author": "Ahmad Rifa'i",
   "license": "BSD-3-Clause",
+  "apidoc": {
+    "title": "SMARAK API Documentation",
+    "template": {
+      "withCompare": false
+    }
+  },
   "scripts": {
     "build": "rimraf dist/ && babel ./ --out-dir dist/ --ignore ./node_modules",
     "start": "yarn build && babel-node --presets es2015 server",
-    "dev": "yarn build && nodemon --exec babel-node --presets es2015 server"
+    "dev": "yarn build && nodemon --exec babel-node --presets es2015 server",
+    "docs": "rm -rf dist/ docs/ && apidoc -i . -e node_modules -o docs"
   },
   "dependencies": {
     "bcrypt": "^5.0.0",

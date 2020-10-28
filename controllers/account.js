@@ -9,6 +9,28 @@ const AccountRegister = require('../models/account/account_register')
 const AccessToken = require('../models/account/access_token')
 const mailer = require('../services/mailer')
 
+/**
+ * @api {post} /account/auth/register Account register
+ * @apiName Account Register
+ * @apiGroup Account Auth
+ * @apiDescription Mendaftarkan akun baru
+ * 
+ * @apiSuccess {String} full_name Nama lengkap akun
+ * @apiSuccess {String} email Email yang nantinya digunakan untuk menerima kode verifikasi dan login/masuk
+ * @apiSuccess {String} phone_num Nomor handphone/seluler akun
+ * @apiSuccess {String} password Password digunakan untuk login/masuk
+ * 
+ * @apiSuccessExample Success-Response: 
+ * {
+ *   "status": "Success",
+ *   "message": "",
+ *   "result": {
+ *       "email": "johndoe@mail.com",
+ *       "token": "ea356de155219cab3e24080fa2551372a1c04f123ee5c3943c4818222be0c53950f4c8f56b39ff8024934454c65",
+ *       "register_time": "2020-10-28T07:34:19.438Z"
+ *   }
+ * }
+ */
 export async function register(req, res) {
 	try {
 		// Validasi untuk register
@@ -55,6 +77,15 @@ export async function register(req, res) {
 	}
 }
 
+/**
+ * @api {post} /account/auth/activate Account activate
+ * @apiName Account Activate
+ * @apiGroup Account Auth
+ * @apiDescription Mengaktifkan akun yang telah melakukan pendaftaran sebelumnya. 
+ * 
+ * @apiSuccess {String} token Gunakan token yang didapatkan setelah pendaftaran
+ * @apiSuccess {Number} code Gunakan kode unik enam angka yang dikirimkan melalui email
+ */
 export async function activate(req, res) {
 	try {
 		// Validasi untuk activasi
@@ -103,6 +134,26 @@ export async function activate(req, res) {
 	}
 }
 
+/** 
+ * @api {post} /account/auth/authorize Account authorize
+ * @apiName Account Athorize
+ * @apiGroup Account Auth
+ * @apiDescription Untuk otorisasi akun
+ * 
+ * @apiSuccess {String} email Gunakan email yang telah terdaftar dan aktif
+ * @apiSuccess {String} password Gunakan password/kata sandi yang telah didaftarkan
+ * 
+ * @apiSuccessExample Success-Response:
+ * {
+ *   "status": "Success",
+ *   "message": "Token created",
+ *   "result": {
+ *       "account_id": "5f9856f4055dd20952e10ed7",
+ *       "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjVmOTg1NmY0MDU1ZGQyMDk1MmUxMGVkNyIsImlhdCI6MTYwMzg3MzA3OCw",
+ *       "expires": "2020-10-28T09:17:58.970Z"
+ *   }
+ * }
+*/
 export async function authorize(req, res) {
 	try {
 		// Validasi untuk authorize
@@ -172,6 +223,14 @@ export async function authorize(req, res) {
 	}
 }
 
+/** 
+ * @api {get} /account/me/info Account info
+ * @apiName Account Info
+ * @apiGroup Account
+ * @apiDescription Untuk mendapatkan info akun yang telah ter-otorisasi
+ * 
+ * @apiHeader {String} X-Access-Token Unique access token
+*/
 export async function me(req, res) {
 	// Mencari akun berdasarkan token_id. token_id ini didapat di dalam file services/verif_token.js
 	// Fungsinya adalah untuk mencari account.id yang sudah di sign menggunakan fungsi jwt.sign()
@@ -195,6 +254,16 @@ export async function me(req, res) {
 	}
 }
 
+/** 
+ * @api {post} /account/me/update?id=ACCOUNT_UNIQUE_ID Account update
+ * @apiName Account Update
+ * @apiGroup Account
+ * @apiDescription Untuk meng-ubah beberapa informasi akun
+ * 
+ * @apiParam {String} ACCOUNT_UNIQUE_ID Gunakan ID akun
+ * 
+ * @apiHeader {String} X-Access-Token Unique access token
+*/
 export async function update(req, res) {
 	try {
 		await Account.findByIdAndUpdate(req.query.id, req.body, function (err, result) {
@@ -222,6 +291,14 @@ export async function update(req, res) {
 	}
 }
 
+/** 
+ * @api {post} /account/auth/unauthorize Account unauthorize
+ * @apiName Account Unauthorize
+ * @apiGroup Account Auth
+ * @apiDescription Untuk logout atau keluar
+ * 
+ * @apiHeader {String} X-Access-Token Unique access token
+*/
 export async function unauthorize(req, res) {
 	// Menghapus token dari collection. Mungkin token sebelumnya yang sudah dihapus
 	// akan tetap valid, itu dikarenakan jwt menganggap token tersebut masih belum
