@@ -56,6 +56,22 @@ class Validator {
 
         return schema.validate(data)
     }
+
+    static resetPassword(data) {
+        const schema = Joi.object().keys({
+            email: Joi.string().lowercase().required().email({ minDomainSegments: 2, tlds: { allow: true } }).trim(),
+        })
+
+        return schema.validate(data)
+    }
+
+    static confirmResetPassword(data) {
+        const schema = Joi.object().keys({
+            password: Joi.string().min(8).max(50).required()
+        })
+
+        return schema.validate(data)
+    }
 }
 
 export default Validator;
