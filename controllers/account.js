@@ -7,6 +7,7 @@ import Validator from '../helpers/validator'
 const Account = require('../models/account/account')
 const AccountRegister = require('../models/account/account_register')
 const AccessToken = require('../models/account/access_token')
+const ResetPassword = require('../models/reset_password')
 const mailer = require('../services/mailer')
 
 /**
@@ -65,7 +66,7 @@ export async function register(req, res) {
 			} else {
 				// Kirim kode aktivasi ke email
 				mailer.mailer(result.email, 'Kode Aktivasi Akun Anda',
-					`<p>Kode aktivasi akun anda adalah <b>${result.code}</b>.<br>
+					`<p>Kode aktivasi akun Anda adalah <b>${result.code}</b>.<br>
 			Jangan berikan kode aktivasi kepada siapa pun termasuk dari pihak SMARAK</p>`)
 
 				return ApiResponse.result(res, 'Success', '', { email: result.email, token: result.token, register_time: result.register_time }, CREATED)
@@ -310,4 +311,108 @@ export async function unauthorize(req, res) {
 			return ApiResponse.result(res, 'Success', 'Unauthorized', null, UNAUTHORIZED)
 		}
 	})
+}
+
+/**
+ * @api {post} /account/auth/reset_password Reset account password
+ * @apiName Reset Password
+ * @apiGroup Account Auth
+ * @apiDescription Untuk reset/atur ulang password
+ * 
+ * @apiSuccess {String} email Gunakan email akun yang telah terdaftar dan aktif
+ */
+export async function resetPassword(req, res) {
+	try {
+		await Account.findOne({ email: req.body.email }, function (err, result) {
+			if (err) {
+				console.error(err);
+			}
+
+			const { error } = Validator.resetPassword(req.body)
+
+			if (error) {
+				const msgErr = error.details[0].message
+
+				return ApiResponse.result(res, 'Failed', msgErr, null, BAD_REQUEST)
+			}
+
+			if (!result) {
+				return ApiResponse.result(res, 'Failed', 'Account not found', null, BAD_REQUEST)
+			}
+
+			const text = uuidv4()
+			const token = Crypto.encrypt(text)
+			const resetPassword = new ResetPassword({
+				account_id: result.id,
+				token: token,
+				expires: Crypto.expires()
+			})
+
+			const { BASE_URL, PORT } = process.env
+			resetPassword.save(function (err, result) {
+				if (err) {
+					console.error(err);
+				}
+
+				const link = `${BASE_URL}:${PORT}/account/auth/reset_password/confirm?token=${result.token}`
+				console.log(req.body.email);
+				mailer.mailer(req.body.email, 'Atur Ulang Kata Sandi Anda',
+					`Klik <a href=${link}>di sini</a> untuk mengatur ulang kata sandi Anda atau gunakan link di bawah ini<br><br> <a href=${link}>${link}</a>`)
+				return ApiResponse.result(res, 'Success', '', { account_id: result.account_id, token: result.token, expires: result.expires }, CREATED)
+			})
+		})
+	} catch (error) {
+		console.error(error.message);
+		return ApiResponse.result(res, 'Failed', 'Internal server error', error.message, INTERNAL_SERVER_ERROR)
+	}
+}
+
+/** 
+ * @api {post} /account/auth/reset_password/confirm?token=TOKEN Confirm reset password
+ * @apiName Confirm Reset Password
+ * @apiGroup Account Auth
+ * @apiDescription Untuk konfirmasi reset password dengan link yang telah dikirim ke email
+ * 
+ * @apiParam {String} TOKEN Gunakan token yang sudah dikirim ke email
+ * @apiSuccess {String} password Buatlah password yang baru
+*/
+export async function confirmPassword(req, res) {
+	try {
+		await ResetPassword.findOne({ token: req.query.token }, function (err, result) {
+			const { error } = Validator.confirmResetPassword(req.body)
+
+			if (error) {
+				const msgErr = error.details[0].message
+
+				return ApiResponse.result(res, 'Failed', msgErr, null, BAD_REQUEST)
+			}
+
+			if (err) {
+				console.error(err);
+			} else if (!result) {
+				return ApiResponse.result(res, 'Failed', 'Not valid', null, BAD_REQUEST)
+			} else {
+				const passHash = Crypto.passHash(req.body.password)
+				Account.findByIdAndUpdate(result.account_id, { password: passHash }, function (err, resUpdate) {
+					console.log(resUpdate.id);
+					if (err) {
+						console.error(err);
+					} else if (!resUpdate.active) {
+						return ApiResponse.result(res, 'Failed', 'Account not yet active', null, UNAUTHORIZED)
+					} else {
+						return ApiResponse.result(res, 'Success', 'Password updated', null, OK)
+					}
+
+					ResetPassword.findOneAndDelete({ account_id: resUpdate.id }, function (error) {
+						if (error) {
+							console.error(error);
+						}
+					})
+				})
+			}
+		})
+	} catch (error) {
+		console.error(error.message);
+		return ApiResponse.result(res, 'Failed', 'Internal server error', error.message, INTERNAL_SERVER_ERROR)
+	}
 }

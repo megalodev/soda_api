@@ -9,6 +9,8 @@ router.route('/account/auth/register').post(account.register)
 router.route('/account/auth/activate').post(account.activate)
 router.route('/account/auth/authorize').post(account.authorize)
 router.route('/account/auth/unauthorize').post(auth.auth, account.unauthorize)
+router.route('/account/auth/reset_password').post(account.resetPassword)
+router.route('/account/auth/reset_password/confirm').post(account.confirmPassword)
 
 // Account routes
 router.route('/account/me/info').get(auth.auth, account.me)
