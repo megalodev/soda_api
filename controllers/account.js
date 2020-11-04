@@ -394,14 +394,14 @@ export async function confirmPassword(req, res) {
 					} else if (!resUpdate.active) {
 						return ApiResponse.result(res, 'Failed', 'Account not yet active', null, UNAUTHORIZED)
 					} else {
+						ResetPassword.findOneAndDelete({ account_id: resUpdate.id }, function (error) {
+							if (error) {
+								console.error(error);
+							}
+						})
+
 						return ApiResponse.result(res, 'Success', 'Password updated', null, OK)
 					}
-
-					ResetPassword.findOneAndDelete({ account_id: resUpdate.id }, function (error) {
-						if (error) {
-							console.error(error);
-						}
-					})
 				})
 			}
 		})
