@@ -8,7 +8,7 @@ const Account = require('../models/account/account')
 const AccountRegister = require('../models/account/account_register')
 const AccessToken = require('../models/account/access_token')
 const ResetPassword = require('../models/reset_password')
-const mailer = require('../services/mailer')
+const mailer = require('../services/mailer/mailer')
 
 /**
  * @api {post} /account/auth/register Account register
@@ -64,10 +64,7 @@ export async function register(req, res) {
 			if (err && err.code === 11000) {
 				return ApiResponse.result(res, 'Failed', 'Account already exists', null, BAD_REQUEST)
 			} else {
-				// Kirim kode aktivasi ke email
-				mailer.mailer(result.email, 'Kode Aktivasi Akun Anda',
-					`<p>Kode aktivasi akun Anda adalah <b>${result.code}</b>.<br>
-			Jangan berikan kode aktivasi kepada siapa pun termasuk dari pihak SMARAK</p>`)
+				mailer.sendEmail(result, result.email, 'Kode Konfirmasi Akun Anda', 'account_activate')
 
 				return ApiResponse.result(res, 'Success', '', { email: result.email, token: result.token, register_time: result.register_time }, CREATED)
 			}
@@ -348,17 +345,14 @@ export async function resetPassword(req, res) {
 				expires: Crypto.expires()
 			})
 
-			const { BASE_URL, PORT } = process.env
 			resetPassword.save(function (err, result) {
 				if (err) {
 					console.error(err);
-				}
+				} else {
+					mailer.sendEmail(result, req.body.email, 'Permintaan Atur Ulang Kata Sandi', 'reset_password')
 
-				const link = `${BASE_URL}:${PORT}/account/auth/reset_password/confirm?token=${result.token}`
-				console.log(req.body.email);
-				mailer.mailer(req.body.email, 'Atur Ulang Kata Sandi Anda',
-					`Klik <a href=${link}>di sini</a> untuk mengatur ulang kata sandi Anda atau gunakan link di bawah ini<br><br> <a href=${link}>${link}</a>`)
-				return ApiResponse.result(res, 'Success', '', { account_id: result.account_id, token: result.token, expires: result.expires }, CREATED)
+					return ApiResponse.result(res, 'Success', '', { account_id: result.account_id, token: result.token, expires: result.expires }, CREATED)
+				}
 			})
 		})
 	} catch (error) {
