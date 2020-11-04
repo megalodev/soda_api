@@ -32,5 +32,9 @@ export function sendEmail(payload, to, subject, templateName) {
         html: html(payload)
     }
 
-    return transporter.sendMail(mail)
+    try {
+        return transporter.sendMail(mail)
+    } catch (error) {
+        console.error(error);
+    }
 }
