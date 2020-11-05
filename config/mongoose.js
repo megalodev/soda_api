@@ -1,24 +1,36 @@
 import mongoose from 'mongoose'
 require('dotenv').config()
 
-const { ENV, DB_URL, DB_URL_TEST } = process.env
+const { NODE_ENV, DB_URL, DB_URL_TEST } = process.env
+const DB = NODE_ENV === 'test' ? DB_URL_TEST : DB_URL
 
-export function dbconn() {
-    const DB = ENV === 'test' ? DB_URL_TEST : DB_URL
+mongoose.connect(DB, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+    useCreateIndex: true,
+    useFindAndModify: false
+})
 
-    mongoose.Promise = Promise
+mongoose.connection.on('error', function (error) {
+    console.error(`Database connection error: ${error}`);
+})
 
-    mongoose.connection.on('error', function (err) {
-        console.error(`Database connection error: ${err}`)
-        process.exit(1)
+mongoose.connection.on('disconnected', function () {
+    console.log('Database disconnected');
+})
+
+const onTerminate = function () {
+    mongoose.connection.close(function () {
+        console.log('Database connection close');
+        process.exit(0)
     })
-    
-    mongoose.connect(DB, {
-        useNewUrlParser: true,
-        useUnifiedTopology: true,
-        useCreateIndex: true,
-        useFindAndModify: false
-    }).then(function () { console.log(`Database connected`) })
+}
 
-    return mongoose.connection
+process.on('SIGINT', onTerminate).on('SIGTERM', onTerminate)
+
+export function dbConnection(app) {
+    mongoose.connection.on('connected', function () {
+        // console.log('Database connected');
+        app
+    })
 }
